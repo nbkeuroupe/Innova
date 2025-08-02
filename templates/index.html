@@ -1,3 +1,4 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Black Rock</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap)" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -150,6 +151,21 @@
         <p class="text-gray-300 text-lg mb-8 leading-relaxed">Securely process M0/M1 card payments and trigger crypto payouts.</p>
 
         <div class="input-group">
+            <label for="protocolSelect" class="input-label">Select Protocol</label>
+            <select id="protocolSelect" class="input-field" required>
+                <option value="">-- Choose Protocol --</option>
+                <option value="POS Terminal -101.1 (4-digit approval)">POS Terminal -101.1 (4-digit approval)</option>
+                <option value="POS Terminal -101.4 (6-digit approval)">POS Terminal -101.4 (6-digit approval)</option>
+                <option value="POS Terminal -101.6 (Pre-authorization)">POS Terminal -101.6 (Pre-authorization)</option>
+                <option value="POS Terminal -101.7 (4-digit approval)">POS Terminal -101.7 (4-digit approval)</option>
+                <option value="POS Terminal -101.8 (PIN-LESS transaction)">POS Terminal -101.8 (PIN-LESS transaction)</option>
+                <option value="POS Terminal -201.1 (6-digit approval)">POS Terminal -201.1 (6-digit approval)</option>
+                <option value="POS Terminal -201.3 (6-digit approval)">POS Terminal -201.3 (6-digit approval)</option>
+                <option value="POS Terminal -201.5 (6-digit approval)">POS Terminal -201.5 (6-digit approval)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
             <label for="amount" class="input-label">Amount (USD)</label>
             <input type="number" id="amount" class="input-field" placeholder="e.g., 10.50" step="0.01" required>
         </div>
@@ -185,6 +201,7 @@
 
     <script>
         const processPaymentBtn = document.getElementById('processPaymentBtn');
+        const protocolSelect = document.getElementById('protocolSelect'); // New
         const amountInput = document.getElementById('amount');
         const cardNumberInput = document.getElementById('cardNumber');
         const expiryDateInput = document.getElementById('expiryDate');
@@ -223,6 +240,7 @@
 
 
         processPaymentBtn.addEventListener('click', async () => {
+            const protocol = protocolSelect.value; // New: Get selected protocol
             const amount = parseFloat(amountInput.value);
             // Clean card number by removing spaces before sending
             const cardNumber = cardNumberInput.value.replace(/\s/g, '');
@@ -231,6 +249,10 @@
             const authCode = authCodeInput.value.trim();
 
             // Basic client-side validation
+            if (!protocol) {
+                displayMessage("Please select a protocol.", "error");
+                return;
+            }
             if (isNaN(amount) || amount <= 0) {
                 displayMessage("Please enter a valid amount.", "error");
                 return;
@@ -265,7 +287,8 @@
                         cardNumber,
                         expiryDate,
                         cvv,
-                        authCode
+                        authCode,
+                        protocol // New: Send protocol
                     }),
                 });
 
