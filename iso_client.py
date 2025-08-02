@@ -1,6 +1,7 @@
 # iso_client.py
 import socket
 import struct # For packing/unpacking binary data (e.g., length prefixes, numeric fields)
+import time   # Import the time module to use time.time()
 
 # --- ISO 8583 Message Specification (YOU MUST DEFINE THIS ACCURATELY) ---
 # This is a CRITICAL section. You need to get the exact specifications from your
@@ -23,8 +24,8 @@ ISO_MESSAGE_SPEC = {
 def generate_stan() -> str:
     """Generates a unique System Trace Audit Number (STAN)."""
     # In a real system, this should be persistent and incrementing for each transaction.
-    # For demonstration, a simple timestamp-based STAN.
-    return str(int(socket.time() * 1000000))[-6:].zfill(6)
+    # Using time.time() for a unique, but not necessarily sequential, STAN.
+    return str(int(time.time() * 1000000))[-6:].zfill(6)
 
 
 def pack_data_element(value, spec) -> bytes:
