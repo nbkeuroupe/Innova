@@ -8,7 +8,6 @@ import json # Needed for loading ABI from a file
 
 # Conceptual imports for a real blockchain interaction
 from web3 import Web3
-from web3.middleware import geth_poa_middleware # For PoA networks like BSC, Polygon
 
 # Path to your USDT ABI file
 USDT_ABI_PATH = "usdt_abi.json"
