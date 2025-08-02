@@ -1,8 +1,7 @@
 # app.py
 import os
 from flask import Flask, render_template, request, jsonify
-from iso_client import send_iso_request
-from crypto import trigger_crypto_payout
+from iso_client import send_iso_request, FIELD_39_RESPONSES # Import FIELD_39_RESPONSES for use in app.py if needed, or just keep in iso_client
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -42,14 +41,15 @@ def process_payment():
     expiry_date = data.get('expiryDate')
     cvv = data.get('cvv')
     auth_code = data.get('authCode')
+    protocol_name = data.get('protocol') # New: Get selected protocol
 
-    if not all([amount, card_number, expiry_date, cvv]): # Auth code is optional
-        return jsonify({"status": "error", "message": "Missing required payment details"}), 400
+    if not all([amount, card_number, expiry_date, cvv, protocol_name]): # Auth code is optional, protocol is required
+        return jsonify({"status": "error", "message": "Missing required payment details or protocol selection"}), 400
 
-    app.logger.info(f"Received payment request: Amount={amount}, Card={card_number}, Exp={expiry_date}, CVV={cvv}, Auth={auth_code}")
+    app.logger.info(f"Received payment request: Amount={amount}, Card={card_number}, Exp={expiry_date}, CVV={cvv}, Auth={auth_code}, Protocol={protocol_name}")
 
     # Step 1: Send ISO 8583 Authorization Request to the Card Owner's ISO 8583 Server
-    # Pass all collected card details to the ISO client
+    # Pass all collected card details and the selected protocol to the ISO client
     iso_response = send_iso_request(
         ISO_SERVER_HOST,
         ISO_SERVER_PORT,
@@ -57,7 +57,8 @@ def process_payment():
         amount,
         expiry_date,
         cvv,
-        auth_code
+        auth_code,
+        protocol_name # New: Pass protocol name
     )
 
     transaction_status = iso_response.get('status')
